@@ -1,0 +1,12 @@
+{
+  "name": "cinema-ticket-booking",
+  "private": true,
+  "description": "Convenience scripts only. Each package has its own package.json and lockfile.",
+  "scripts": {
+    "install:all": "npm ci --prefix services/api && npm ci --prefix services/payment && npm ci --prefix services/notification && npm ci --prefix apps/web",
+    "lint": "npm run lint --prefix services/api && npm run lint --prefix services/payment && npm run lint --prefix services/notification && npm run lint --prefix apps/web",
+    "test": "npm test --prefix services/api && npm test --prefix services/payment && npm test --prefix services/notification && npm test --prefix apps/web",
+    "up": "docker compose up --build",
+    "down": "docker compose down"
+  }
+}
