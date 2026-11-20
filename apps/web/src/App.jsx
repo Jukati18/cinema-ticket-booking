@@ -1,9 +1,8 @@
-// Placeholder only. FE owner replaces this (router, Tailwind, shadcn/ui...).
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider } from 'react-router/dom';
+import { BookingProvider } from './features/booking/context';
+import { router } from './routes/router';
+const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: 30000, retry: 1 } } });
 export default function App() {
-  return (
-    <main>
-      <h1>Cinema Ticket Booking</h1>
-      <p>SPA skeleton is running. API: {import.meta.env.VITE_API_URL}</p>
-    </main>
-  );
+  return <QueryClientProvider client={queryClient}><BookingProvider><RouterProvider router={router} /></BookingProvider></QueryClientProvider>;
 }
