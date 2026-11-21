@@ -1,0 +1,2 @@
+import {test,expect} from '@playwright/test';
+test('flat branch selectors include all regions',async({page})=>{await page.goto('/movies');const h=page.getByRole('combobox',{name:'Cụm rạp hiện tại'});await expect(h.locator('option')).toHaveCount(9);await expect(h.locator('optgroup')).toHaveCount(0);await page.locator('#quick-cinema').selectOption('cinema-8');await expect(h).toHaveValue('cinema-8');});

@@ -1,0 +1,20 @@
+import { Link, NavLink, Outlet, useNavigation, useLocation, useSearchParams, useNavigate } from 'react-router';
+import { useEffect } from 'react';
+import { Clapperboard, Ticket, UserRound, House, CalendarDays, ShieldCheck, MapPin } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { cinemaApi } from '../lib/cinema-api';
+export function Brand() { return <span className="brand"><span className="brand-mark"><Clapperboard size={22} /></span><span><span className="brand-name">Cine<b>Vibe</b></span><span className="brand-caption">CINEMA & BEYOND</span></span></span>; }
+export default function CustomerLayout() {
+ const navigation = useNavigation();
+ const [params] = useSearchParams();
+ const navigate = useNavigate();
+ const cinemas = useQuery({ queryKey: ['cinemas'], queryFn: cinemaApi.getCinemas });
+ const cinemaId = cinemas.data?.some((c) => c.id === params.get('cinemaId')) ? params.get('cinemaId') : '';
+ function chooseCinema(id) { const next = new URLSearchParams(params); next.set('cinemaId', id); navigate(`/movies?${next}`); }
+
+ const { pathname } = useLocation();
+ const showId = pathname.match(/^\/booking\/([^/]+)/)?.[1];
+ const currentShow = useQuery({ queryKey: ['showtime', showId], queryFn: () => cinemaApi.getShowtime(showId), enabled: Boolean(showId) });
+ useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+ return <><a className="skip-link" href="#content">Bỏ qua điều hướng</a><header className="site-header"><div className="shell header-inner"><Link to="/movies" aria-label="CineVibe - Trang chủ"><Brand /></Link><label className="header-cinema"><MapPin size={18} className="cyan" /><span><select aria-label="Cụm rạp hiện tại" value={currentShow.data?.cinemaId || cinemaId} disabled={!cinemas.data} onChange={(e) => chooseCinema(e.target.value)}><option value="">Tất cả rạp</option>{cinemas.data?.map((c) => <option key={c.id} value={c.id}>{c.name.replace(/ \(.*?\)/g, '')} ({c.city})</option>)}</select></span></label><nav aria-label="Điều hướng chính"><Link to="/movies" aria-current={pathname === '/movies' || pathname.startsWith('/movies/') ? 'page' : undefined}>Phim</Link><NavLink to="/schedule">Lịch chiếu</NavLink><NavLink to="/lookup">Tra cứu vé</NavLink></nav><form className="header-search" role="search" onSubmit={(e)=>{e.preventDefault();const q=new FormData(e.currentTarget).get('q');navigate('/movies?q='+encodeURIComponent(q));}}><input name="q" aria-label="Tìm kiếm phim" placeholder="Tìm phim…" defaultValue={params.get('q') || ''}/></form><div className="header-actions"><Link className="lookup" to="/lookup"><Ticket size={16} className="cyan" />Tra cứu vé</Link><Link className="member" to="/login"><UserRound size={16} />Thành viên</Link></div></div></header>{navigation.state !== 'idle' && <p role="status" className="shell mt-4">Đang mở trang…</p>}<main id="content" className="shell" tabIndex={-1}><Outlet /></main><footer><div className="shell"><div className="footer-grid"><div><Brand /><p>Trải nghiệm điện ảnh cùng CineVibe. Chọn phim, tìm suất chiếu và đặt chỗ trực tuyến.</p><p className="cyan">Cinema Ticket Booking System · Đồ án Web</p></div><div><h3>Khám phá CineVibe</h3><div className="footer-links"><Link to="/movies">Phim & lịch chiếu</Link><Link to="/lookup">Tra cứu vé</Link><Link to="/login">Tài khoản thành viên</Link></div></div><div><h3>Đặt vé trực tuyến</h3><p>Thanh toán giả lập trong bản chạy thử. Không nhập thông tin thẻ hoặc dữ liệu cá nhân thật.</p><p className="cyan flex items-center gap-2"><ShieldCheck size={16} />Guest checkout · Không cần đăng nhập</p></div></div><div className="footer-bottom"><span>© 2026 CineVibe · Giao diện đồ án, không phải dịch vụ rạp đang kinh doanh</span><span>Tiếng Việt · Asia/Ho_Chi_Minh · VND</span></div></div></footer><nav className="mobile-nav" aria-label="Điều hướng di động"><NavLink to="/movies"><House size={18} />Phim</NavLink><Link to="/movies#schedule"><CalendarDays size={18} />Lịch chiếu</Link><NavLink to="/lookup"><Ticket size={18} />Tra cứu vé</NavLink><NavLink to="/login"><UserRound size={18} />Tài khoản</NavLink></nav></>;
+}
