@@ -1,0 +1,2 @@
+import {test,expect} from '@playwright/test';
+test('all cinemas by default; explicit branch survives reload and detail navigation',async({page})=>{await page.goto('/movies');const h=page.getByRole('combobox',{name:'Cụm rạp hiện tại'});await expect(h).toHaveValue('');await h.selectOption('cinema-3');await expect(page.locator('#quick-cinema')).toHaveValue('cinema-3');await page.reload();await expect(h).toHaveValue('cinema-3');});

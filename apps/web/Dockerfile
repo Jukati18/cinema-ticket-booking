@@ -5,7 +5,9 @@ RUN npm ci
 COPY . .
 # VITE_* values are baked into the bundle at build time: never put secrets here.
 ARG VITE_API_URL
+ARG VITE_DATA_SOURCE=mock
 ENV VITE_API_URL=$VITE_API_URL
+ENV VITE_DATA_SOURCE=$VITE_DATA_SOURCE
 RUN npm run build
 
 FROM nginx:1.27-alpine

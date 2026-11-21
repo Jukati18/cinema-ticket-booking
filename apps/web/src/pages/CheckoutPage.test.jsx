@@ -1,0 +1,22 @@
+import { vi, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createMemoryRouter } from 'react-router';
+import { RouterProvider } from 'react-router/dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BookingProvider } from '../features/booking/context';
+import { Component as Checkout } from './CheckoutPage';
+import { cinemaApi } from '../lib/cinema-api';
+vi.mock('../lib/cinema-api', () => ({ isMock: true, cinemaApi: { getShowtime: vi.fn(), getHold: vi.fn(), createBooking: vi.fn(), releaseHold: vi.fn() } }));
+it('validates contact before API call and renders server field errors', async () => {
+  cinemaApi.getShowtime.mockResolvedValue({ id: 's1', movie: { title: 'Phim mẫu', durationMinutes: 90 }, startsAt: '2026-11-22T10:30:00Z', cinemaName: 'Rạp mẫu', roomName: 'Phòng 1', format: '2D' });
+  cinemaApi.getHold.mockResolvedValue({ id: 'h1', showtimeId: 's1', seatIds: ['A1'], totalAmount: 75000, expiresAt: new Date(Date.now() + 300000).toISOString() });
+  cinemaApi.createBooking.mockRejectedValue(Object.assign(new Error('Thông tin chưa hợp lệ'), { fieldErrors: { email: 'Email này bị từ chối bởi máy chủ' } }));
+  const router = createMemoryRouter([{ path: '/booking/:showtimeId/checkout', element: <Checkout /> }], { initialEntries: ['/booking/s1/checkout?hold=h1'] });
+  render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}><BookingProvider><RouterProvider router={router} /></BookingProvider></QueryClientProvider>);
+  const submit = await screen.findByRole('button', { name: 'Thanh toán giả lập', exact: true });
+  const user = userEvent.setup(); await user.click(submit);
+  expect(await screen.findByText('Nhập họ tên từ 2 ký tự')).toBeVisible(); expect(cinemaApi.createBooking).not.toHaveBeenCalled();
+  await user.type(screen.getByLabelText(/Họ và tên/), 'Nguyễn An'); await user.type(screen.getByLabelText(/Email nhận vé/), 'an@example.com'); await user.type(screen.getByLabelText(/Số điện thoại/), '0901234567'); await user.click(submit);
+  expect(await screen.findByText('Email này bị từ chối bởi máy chủ')).toBeVisible(); expect(screen.getByLabelText(/Email nhận vé/)).toHaveAttribute('aria-invalid', 'true');
+});
