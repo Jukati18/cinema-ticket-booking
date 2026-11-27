@@ -140,11 +140,14 @@ describe('Form components', () => {
 
     await user.click(screen.getByRole('button', { name: 'Gửi' }));
 
-    expect(handleSubmit).toHaveBeenCalledWith({
-      title: 'Phim Mới',
-      status: 'active',
-      genres: ['action'],
-    });
+    expect(handleSubmit).toHaveBeenCalledWith(
+      {
+        title: 'Phim Mới',
+        status: 'active',
+        genres: ['action'],
+      },
+      expect.anything(),
+    );
   });
 });
 
