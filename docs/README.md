@@ -21,6 +21,6 @@ Each module file contains the use cases and user stories of that module. Use cas
 
 | File | Owner | Use cases | User stories |
 |---|---|---|---|
-<!--Each member add name file and other attribute here  -->
+| [admin-operation.md](requirements/admin-operation.md) | Phan Thành Lộc (M5) | UC14, UC17 (UI data: UC13, UC15, UC16, UC18–UC21) | US22, US26 |
 
 Templates are in `requirements/templates/`. Use them for every new use case and user story.
