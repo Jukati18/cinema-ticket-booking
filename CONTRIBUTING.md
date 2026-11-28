@@ -3,8 +3,8 @@
 ## Branches (Git)
 
 - `main`: always runnable, protected, merged only via Pull Request with green CI.
-- Working branches are created from `main` and named `<type>/<short-description>`:
-  `feat/seat-map`, `fix/refresh-token-reuse`, `chore/ci-cache`, `docs/erd`.
+- Working branches are created from `main` and named `<name>-sprint-<x>`:
+  `viet-sprint-1`, `phat-sprint-2`.
 - Keep branches short-lived (1-3 days) and rebase or merge `main` often.
 
 ## Commits (Conventional Commits)
